@@ -1,0 +1,48 @@
+#include<iostream>
+using namespace std;
+struct node
+{
+	int data;
+	node *next;
+};
+void createlist(node *&head)
+{
+	int x = 0;
+	node *s;
+	node *p = NULL;
+	s = new node;
+	s->next = NULL;
+	while (cin >> s->data)
+	{
+		x++;
+		if (head == NULL)
+		{
+			head = s;
+			p = head;
+		}
+		else
+		{
+			p->next = s;
+			p = s;
+		}
+		s = new node;
+		s->next = nullptr;
+		if (x == 5)
+			return;
+	}
+}
+void showlist(node *head)
+{
+	while (head)
+	{
+		cout << head->data;
+		head = head->next;
+	}
+}
+int main()
+{
+	node*head = NULL;
+	createlist(head);
+	showlist(head);
+	system("pause");
+}
