@@ -1,0 +1,40 @@
+#include<iostream>
+using namespace std;
+struct node
+{
+	int data;
+	node* next;
+};
+class stack 
+{   public:
+	node* first;
+	stack()
+	{
+		first = new node{ 0,NULL };
+	}
+	bool kong(stack *S)
+	{
+		return S->first->next == NULL;
+	}
+	void yaru(stack*&S,double val);
+	int tanchu(stack*&S);
+	string jinzhizhanhuan(double x, int n);
+};
+void stack::yaru(stack* &S,double val)
+{
+	node *p = S->first;
+	node *s = new node{ val,NULL };
+	s->next = p->next;
+	p->next = s;
+}
+int stack::tanchu(stack*&S)
+{
+	if (kong(S))
+		return -1;
+	node *p = S->first;
+	node *q = p->next;
+	int x = q->data;
+	p->next = q->next;
+	delete q;
+	return x;
+}
