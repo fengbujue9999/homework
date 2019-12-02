@@ -1,0 +1,97 @@
+#include<iostream>
+#include<algorithm>
+#include<stack>
+#include<string>
+#include<queue>
+#pragma warning(disable:4996)
+using namespace std;
+#define MaxSize 100//最大长度
+#define INF 999999//
+struct EdgeType //网络结构体
+{
+	int from, to;//开始节点和结束节点
+	int weight;//权重
+};
+bool cmp(EdgeType& a, EdgeType& b) //重写比较函数
+{
+	return a.weight < b.weight;
+}
+class MGraph {
+public:
+	MGraph();
+	int FindRoot(int parent[], int v);//找到节点
+	int kruskal();
+private:
+	int vertexNum, arcNum;//节点个数.道路个数
+	int vertex[MaxSize];//节点数组
+	EdgeType edge[MaxSize];
+	int arc[MaxSize][MaxSize];//2维数组
+};
+MGraph::MGraph() {
+	cout << "请输入城市个数和道路个数：\n";
+	cin >> vertexNum >> arcNum;
+	for (int i = 0; i < vertexNum; i++)vertex[i] = i;//初始化节点数组
+	for (int i = 0; i < vertexNum; i++) 
+	{
+		for (int j = 0; j < vertexNum; j++)
+			arc[i][j] = i == j ? 0 : INF;//初始化邻接矩阵
+	}
+	/*for (int i = 0; i < vertexNum; i++)
+	{
+		for (int j = 0; j < vertexNum; j++)
+			cout << arc[i][j] << endl;
+	}*/
+	int i, j, k;
+	cout << "请输入两个城市的代号以及道路长度：\n";
+	for (int ll = 0; ll < arcNum; ll++)
+	{
+		cin >> i >> j >> k;
+		arc[i][j] = arc[j][i] = k;
+		edge[ll] = { i,j,k };
+	}
+	sort(edge, edge + arcNum, cmp);
+}
+int MGraph::FindRoot(int parent[], int v) //寻找根节点
+{
+	return parent[v] == -1 ? v : parent[v];
+}
+int MGraph::kruskal() {
+	int sum = 0;
+	int* parent = new int[vertexNum];
+	for (int i = 0; i < vertexNum; i++)
+		parent[i] = -1;//将parent数组初始化
+	for (int num = 0, i = 0; i < vertexNum; i++) 
+	{
+		int v1 = FindRoot(parent, edge[i].from);//两个节点分别初始化为一条边的两个节点
+		int v2 = FindRoot(parent, edge[i].to);
+		if (v1 != v2) 
+		{
+			printf("城市%d和城市%d之间走长度为%d的道路\n", v1, v2, edge[i].weight);
+			sum += edge[i].weight;//累积求和
+			parent[v1] = v2;//合并节点的父母
+			num++;//
+			if (num == vertexNum - 1)
+				return sum;
+		}
+	}
+}
+int main() {
+	MGraph graph;
+	cout << graph.kruskal();
+	system("pause");
+}
+/*
+6 9
+
+0 1 34
+1 4 12
+0 5 19
+4 5 26
+0 2 46
+3 4 38
+2 3 17
+2 5 25
+3 5 25
+
+*/
+
