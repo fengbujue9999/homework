@@ -1,0 +1,84 @@
+#include <iostream>
+#include <stack>
+using namespace std;
+typedef struct Node
+{
+    char data;
+    struct Node* lchild;
+    struct Node* rchild;
+}Tree;
+Tree* createBinTree()
+{
+    char ch;
+    Tree* root;
+    if ((ch = getchar()) != '#')
+	{
+		root=new Tree;
+        if (root == NULL)
+		{
+            return NULL;
+        }
+        root->data = ch;
+        root->lchild=createBinTree();
+        root->rchild = createBinTree();
+    }
+    else{
+        return NULL;
+    }
+    return root;
+}
+void createBinTree(Tree* &t)
+{
+
+    char ch;
+	cin>>ch;
+    if (ch != '#'){
+		t=new Tree;
+        t->data = ch;
+        createBinTree(t->lchild);
+        createBinTree(t->rchild);
+    }
+    else
+	{
+        t = NULL;
+		return;
+    }
+}
+void first(Tree*t)
+{
+    if (t != NULL)
+	{
+        cout << t->data;
+        first(t->lchild);
+        first(t->rchild);
+    }
+	return;
+}
+void last(Tree* t)
+{
+    stack<Tree*> stack;
+    Tree* p = t;
+    while (p != NULL || (!stack.empty()))
+	{
+        while (p != NULL){
+            stack.push(p);
+            p = p->lchild;
+        }
+        if (!stack.empty())
+		{   p = stack.top();
+			stack.pop();
+            cout << p->data << " ";         
+            p = p->rchild;
+        }
+    }
+	return;
+}
+int main(){
+    Tree* t = NULL;
+    createBinTree(t);
+    cout << "前序遍历：";
+   first(t);
+    cout << "\n中序遍历：";
+    last(t);
+	while(1);
+}
