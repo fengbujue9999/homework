@@ -1,0 +1,163 @@
+#include"pch.h"
+#include<iostream>
+#include<stack>
+#include<queue>
+#include<string>
+using namespace std;
+const int COST = 1;
+struct Car
+{
+	string name;
+	int num;
+	int begin_time;
+	int wait_time;
+	int end_time;
+	Car(string name, int begin_time)
+	{
+		this->name = name;
+		this->begin_time = begin_time;
+	}
+};
+class Park
+{
+public:
+	void InCar(string name, int begin_time);
+	void OutCar(string name, int end_time);
+	void Print(Car car,int);
+private:
+	stack<Car>park;
+};
+class Road
+{
+public:
+	void InCar(string name, int begin_time);
+	void OutCar(string name, int end_time);
+	void Print(Car car,int);
+private:
+	queue<Car>road;
+};
+void Park::InCar(string name, int begin_time)
+{
+	park.push(Car(name, begin_time));
+}
+void Park::OutCar(string name, int end_time)
+{
+	if (park.empty())
+	{
+		cout << "停车场内没有车辆！\n";
+		return;
+	}
+	stack<Car>temp;
+	while (!park.empty())
+	{
+		if (park.top().name == name)
+		{
+
+			Print(park.top(),end_time);
+			//park.pop();
+			break;
+		}
+		temp.push(park.top());
+		park.pop();
+	}
+	if (park.empty())
+		cout << "停车场内不存在该车辆！\n";
+	else
+		park.pop();
+	while (!temp.empty())
+	{
+		park.push(temp.top());
+		temp.pop();
+	}
+}
+void Park::Print(Car car,int end_time)
+{
+	car.wait_time = end_time - car.begin_time;
+	printf("车辆 %s 已在停车场内停留%d小时 停车费用%d元\n", car.name.data(), car.wait_time, car.wait_time * COST);
+}
+void Road::InCar(string name, int begin_time)
+{
+	road.push(Car(name, begin_time));
+}
+void Road::OutCar(string name, int end_time)
+{
+	if (road.empty())
+	{
+		cout << "便道上暂无车辆！\n";
+		return;
+	}
+	stack<Car>temp;
+	while (!road.empty())
+	{
+		if (road.front().name == name)
+		{
+			Print(road.front(), end_time);
+			break;
+		}
+		temp.push(road.front());
+		road.pop();
+	}
+	if (road.empty())
+	{
+		cout << "便道上不存在该车辆！\n";
+	}
+	else
+		road.pop();
+	while (!temp.empty())
+	{
+		road.push(temp.top());
+		temp.pop();
+	}
+}
+void Road::Print(Car car, int end_time)
+{
+	car.wait_time = end_time - car.begin_time;
+	printf("车辆 %s 已在便道上停留%d小时\n", car.name.data(), car.wait_time);
+}
+int main()
+{
+	Park P;
+	Road R;
+	string car_name,op,place;
+	int begin_time, end_time;
+	freopen("in.txt", "r", stdin);
+	while (1)
+	{
+		cout << "输入操作和车牌号:\n";
+		cin >> op>>car_name;
+		if (op == "in")
+		{
+			cout << "输入地点和停车时间：\n";
+			cin >> place>>begin_time;
+			if (place == "P")
+			{
+				P.InCar(car_name, begin_time);
+				cout << "停车成功！\n";
+			}
+			else if (place == "R")
+			{
+				R.InCar(car_name, begin_time);
+				cout << "停车成功！\n";
+			}
+			else
+				cout << "地址输入错误！\n";
+		}
+		else if (op == "out")
+		{
+			cout << "输入地点和离开时间：\n";
+			cin >> place >> end_time;
+			if (place == "P")
+			{
+				P.OutCar(car_name, end_time);
+			}
+			else if (place == "R")
+			{
+				R.OutCar(car_name, end_time);
+			}
+			else
+				cout << "地址输入错误！\n";
+		}
+		else
+			cout << "输入操作错误！\n";
+	}
+}
