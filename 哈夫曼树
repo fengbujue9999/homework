@@ -1,0 +1,101 @@
+#include<iostream>
+#include<fstream>
+#include<algorithm>
+using namespace std;
+struct Node {
+	char ch;
+	int num;
+	string code;
+	int parent;
+	int left, right;
+	Node() {
+		parent = left = right = -1;
+	}
+};
+bool cmp(Node a, Node b) {
+	return a.num < b.num;
+}
+void ReadFile(ifstream& in, string name, Node dp[]) {
+	in.open(name, ios::in);
+	if (!in.is_open())
+		exit(-1);
+	char x;
+	while (in.get(x)) {
+		dp[x].ch = x;
+		dp[x].num++;
+	}
+	sort(dp, dp + 200, cmp);
+	in.close();
+}
+int GetCodeLength(Node dp[], int begin, int end) {
+	int Count = 0;
+	for (int i = begin; i < end; i++)Count += dp[i].num * dp[i].code.size();
+	return Count;
+}
+void GenerateCode(Node huff[], int root) {
+	if (root == -1)return;
+	int left = huff[root].left;
+	int right = huff[root].right;
+	if (left != -1) {
+		huff[left].code.append(huff[root].code);
+		huff[left].code.push_back('0');
+		GenerateCode(huff, left);
+	}
+	if (right != -1) {
+		huff[right].code.append(huff[root].code);
+		huff[right].code.push_back('1');
+		GenerateCode(huff, right);
+	}
+}
+void PrintTree(Node huff[], int len) {
+	for (int i = 0; i < len; i++) {
+		if (huff[i].ch != 0)
+			printf("%c的编码为：%s    出现次数为%d\n", huff[i].ch, huff[i].code.data(), huff[i].num);
+	}
+}
+void Select(Node huff[], int len, int &idx1, int &idx2) {
+	idx1 = idx2 = -1;
+	for (int i = 0; i < len; i++) {
+		if (huff[i].parent == -1) {
+			if (idx1 < 0 || huff[i].num < huff[idx1].num)idx1 = i;
+		}
+	}
+	for (int i = 0; i < len; i++) {
+		if (huff[i].parent == -1) {
+			if (i != idx1) {
+				if (idx2 < 0 || huff[i].num < huff[idx2].num)idx2 = i;
+			}
+		}
+	}
+}
+void CreateHuffTree(Node dp[], int begin, int end) {
+	int len = end - begin;
+	int k = len;
+	Node* huff = new Node[2 * len - 1];
+	for (int i = 0; i < len; i++)
+		huff[i] = dp[i + begin];
+	for (int i = 0; i < len - 1; i++) {
+		int idx1 = -1, idx2 = -1;
+		Select(huff, k, idx1, idx2);
+		huff[k].ch = 0;
+		huff[k].num = huff[idx1].num + huff[idx2].num;
+		huff[k].left = idx1, huff[k].right = idx2;
+		huff[idx1].parent = huff[idx2].parent = k;
+		k++;
+	}
+	GenerateCode(huff, k - 1);
+	PrintTree(huff, k);
+	int Length = GetCodeLength(huff, 0, len);
+	printf("编码总长度：%d\n", Length);
+}
+Node dp[200];
+int main() {
+	string fileName = "test.txt";
+	ifstream in;
+	ReadFile(in, fileName, dp);
+	int index = 199;
+	while (index >= 0 && dp[index].num != 0)index--;
+	CreateHuffTree(dp, index, 200);
+
+	while (1);
+}
