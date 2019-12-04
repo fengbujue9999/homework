@@ -1,0 +1,111 @@
+#include<iostream>
+#include<algorithm>
+#include<stack>
+#include<queue>
+#pragma warning(disable:4996)
+using namespace std;
+#define MaxSize 20
+#define INF 999999
+struct _Ty {
+	int lowcost;
+	int adjvex;
+};
+template<typename DataType>
+class MGraph {
+public:
+	MGraph(DataType a[], int n, int e);
+	void DFSTraverse(int v);
+	void BFSTraverse(int v);
+	void Prim();
+private:
+	DataType vertex[MaxSize];
+	int arc[MaxSize][MaxSize];
+	int vertexNum, arcNum;
+};
+int visited[MaxSize];
+template<typename DataType>
+MGraph<DataType>::MGraph(DataType a[], int n, int e) {
+	vertexNum = n, arcNum = e;
+	for (int i = 0; i < vertexNum; i++)
+		vertex[i] = a[i];
+	for (int i = 0; i < vertexNum; i++) {
+		for (int j = 0; j < vertexNum; j++)
+			arc[i][j] = i==j?0:INF;
+	}
+	int i, j,dist;
+	for (int k = 0; k < arcNum; k++) {
+		cin >> i >> j>>dist;
+		arc[i][j] = arc[j][i] = dist;
+	}
+}
+template<typename DataType>
+void MGraph<DataType>::DFSTraverse(int v) {
+	cout << vertex[v] << " ";
+	visited[v] = 1;
+	for (int i = 0; i < vertexNum; i++) {
+		if (arc[v][i] == 1 && !visited[i]) {
+			DFSTraverse(i);
+		}
+	}
+}
+template<typename DataType>
+void MGraph<DataType>::BFSTraverse(int v) {
+	queue<int>q;
+	q.push(v);
+	cout << vertex[v] << " ";
+	visited[v] = 1;
+	while (!q.empty()) {
+		v = q.front();
+		q.pop();
+		for (int i = 0; i < vertexNum; i++) {
+			if (arc[v][i] == 1 && !visited[i]) {
+				cout << vertex[i] << " ";
+				visited[i] = 1;
+				q.push(i);
+			}
+		}
+	}
+}
+int MinEdge(_Ty shortEdge[], int vertexNum) {
+	int idx = -1;
+	for (int i = 0; i < vertexNum; i++) {
+		if (shortEdge[i].lowcost > 0) {
+			if (idx<0 || shortEdge[idx].lowcost>shortEdge[i].lowcost)idx = i;
+		}
+	}
+	return idx;
+}
+template<typename DataType>
+void MGraph<DataType>::Prim() {
+	_Ty *shortEdge = new _Ty[vertexNum];
+	for (int i = 0; i < vertexNum; i++) {
+		shortEdge[i].lowcost = arc[0][i];
+		shortEdge[i].adjvex = 0;
+	}
+	for (int i = 1; i < vertexNum; i++) {
+		int k = MinEdge(shortEdge, vertexNum);
+		shortEdge[k].lowcost = 0;
+		cout << k << " ";
+		for (int j = 0; j < vertexNum; j++)
+		{
+			if (shortEdge[j].lowcost > arc[k][j]) {
+				shortEdge[j].lowcost = arc[k][j];
+				shortEdge[j].adjvex = k;
+			}
+		}
+	}
+}
+int main() {
+	int n, e;
+	int a[MaxSize];
+	freopen("1.txt", "r", stdin);
+	cin >> n >> e;
+	for (int i = 0; i < n; i++)cin >> a[i];
+	MGraph<int> graph(a, n, e);
+	//graph.DFSTraverse(0);
+	cout << endl;
+	fill(visited, visited + MaxSize,  0);
+	//graph.BFSTraverse(0);
+	graph.Prim();
+	while (1);
+}
